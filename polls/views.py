@@ -34,6 +34,14 @@ class ResultView(generic.DetailView):
 def index(request):
     latest_question_list = Question.objects.order_by("-pub_date")[:5]
     context = {"latest_question_list": latest_question_list}
+    if request.user.is_authenticated:
+        print(f"Usuário logado: {request.user.username}")
+        # Pode fazer ações específicas para usuários logados
+        mensagem = f"Bem-vindo de volta, {request.user.username}!"
+    else:
+        print("Usuário não está logado")
+        # Pode redirecionar ou mostrar conteúdo diferente
+        mensagem = "Bem-vindo! Faça login para continuar."
     return render(request, "polls/index.html", context)
 
 def details(request, question_id):
@@ -77,12 +85,12 @@ def login_view(request):
         else:
             messages.error(request, 'Usuário ou senha inválidos!')
 
-    return render(request, 'login.html')
+    return render(request, 'polls/login.html')
 
 def logout_view(request):
     auth.logout(request)
-    messages.sucess(request, 'Logout realizado com sucesso!')
-    return redirect('login')
+    messages.success(request, 'Logout realizado com sucesso!')
+    return redirect('polls:login')
 
 def registro_view(request):
     if request.method == 'POST':
@@ -93,11 +101,19 @@ def registro_view(request):
 
         if password != password_confirm:
             messages.error(request, 'As senhas não são iguais!')
-            return render(request, 'registro.html')
+            return render(request, 'polls/registro.html')
+        
+        if len(password) < 6:
+            messages.error(request, "A senha deve ter pelo menos 6 caracteres!")
+            return render(request, 'polls/registro.html')
         
         if User.objects.filter(username=username).exists():
             messages.error(request, 'Nome de usuário já utilizado!')
-            return render(request, 'registro.html')
+            return render(request, 'polls/registro.html')
+        
+        if User.objects.filter(email=email).exists():
+            messages.error(request, 'Email já cadastrado!')
+            return render(request, 'polls/registro.html')
         
         # Cria o usuario
         user = User.objects.create_user(
@@ -107,15 +123,21 @@ def registro_view(request):
         )
 
         # Cria o perfil
-        Usuario.objects.create(user=user)
+        perfil = Usuario.objects.create(
+            user=user,
+            data_nascimento=data_nascimento if data_nascimento else None,
+            idade=idade if idade else None
+        )
 
-        messages.sucess(request, 'Conta criada com sucesso! Agora faça login.')
+        messages.success(request, 'Conta criada com sucesso! Agora faça login.')
         return redirect('login')
     
-    return render(request, 'registro.html')
+    return render(request, 'polls/registro.html')
+
+
 
 # View protegida (requer login)
 @login_required(login_url='login')
 def perfil_view(request):
     #request.user já esta disponivel e autenticado
-    return render(request, 'perfil.html', {'user': request.user})
+    return render(request, 'polls/perfil.html', {'user': request.user})

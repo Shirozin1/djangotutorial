@@ -1,13 +1,35 @@
-{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    {% load static %}
 
-<link rel="stylesheet" href="{% static 'polls/style.css' %}">
+    <link rel="stylesheet" href="{% static 'polls/style.css' %}">
+</head>
 
-{% if latest_question_list %}
-    <ul>
-    {% for question in latest_question_list %}
-        <li><a href="{% url 'polls:detail' question.id %}">{{ question.question_text }}</a></li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>No polls are available.</p>
-{% endif %}
+<body>
+    <nav>
+        {% if user.is_authenticated %}
+            <!-- Mostrado apenas para usuários LOGADOS -->
+            <p>Olá, {{ user.username }}!</p>
+            <a href="{% url 'polls:perfil' %}">Meu Perfil</a>
+            <a href="{% url 'polls:logout' %}">Sair</a>
+        {% else %}
+            <!-- Mostrado apenas para usuários NÃO LOGADOS -->
+            <a href="{% url 'polls:login' %}">Entrar</a>
+            <a href="{% url 'polls:registro' %}">Cadastrar</a>
+        {% endif %}
+    </nav>
+
+    {% block content%}
+        {% if latest_question_list %}
+            <ul>
+            {% for question in latest_question_list %}
+                <li><a href="{% url 'polls:detail' question.id %}">{{ question.question_text }}</a></li>
+            {% endfor %}
+            </ul>
+        {% else %}
+            <p>No polls are available.</p>
+        {% endif %}
+    {%endblock%}
+</body>
+</html>

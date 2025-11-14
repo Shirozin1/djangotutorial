@@ -1,7 +1,10 @@
 from django.contrib import admin
-from .models import Question, Choice
+from .models import Question, Choice, Usuario
 
-
+@admin.register(Usuario)
+class UsuarioAdmin(admin.ModelAdmin):
+    list_display = ['nomeUsuario', 'data_nascimento', 'idade']
+    search_fields = ['nomeUsuario__username', 'idade']
 
 class ChoiceInLine(admin.TabularInline):
     model = Choice

@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Perfil</title>
+</head>
+<body>
+    <h2>Bem-vindo, {{ user.username }}!</h2>
+    <p>Email: {{ user.email }}</p>
+    
+    {% if user.userprofile.idade %}
+        <p>Idade: {{ user.userprofile.idade }} anos</p>
+    {% endif %}
+    
+    <a href="{% url 'polls:index' %}">Voltar</a>
+    <a href="{% url 'polls:logout' %}">Sair</a>
+</body>
+</html>

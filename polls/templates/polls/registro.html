@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Registro</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'polls/style.css' %}">
+    <style>
+        .form-container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .mensagem {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .mensagem.error {
+            color: red;
+            background-color: #ffebee;
+            border: 1px solid red;
+        }
+        .mensagem.success {
+            color: green;
+            background-color: #e8f5e9;
+            border: 1px solid green;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>Criar Conta</h2>
+        
+        {% if messages %}
+            {% for message in messages %}
+                <p class="mensagem {{ message.tags }}">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+        
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="username">Usuário: *</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email: *</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Senha: *</label>
+                <input type="password" id="password" name="password" required minlength="6">
+            </div>
+            
+            <div class="form-group">
+                <label for="password_confirm">Confirmar Senha: *</label>
+                <input type="password" id="password_confirm" name="password_confirm" required minlength="6">
+            </div>
+            
+            <div class="form-group">
+                <label for="telefone">Telefone:</label>
+                <input type="tel" id="telefone" name="telefone" placeholder="(11) 99999-9999">
+            </div>
+            
+            <div class="form-group">
+                <label for="data_nascimento">Data de Nascimento:</label>
+                <input type="date" id="data_nascimento" name="data_nascimento">
+            </div>
+            
+            <button type="submit">Cadastrar</button>
+        </form>
+        
+        <p style="text-align: center; margin-top: 20px;">
+            Já tem conta? <a href="{% url 'polls:login' %}">Faça login</a>
+        </p>
+    </div>
+</body>
+</html>     
