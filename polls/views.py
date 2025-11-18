@@ -10,27 +10,32 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from .models import Question, Choice, Usuario
 
+
 class IndexView(generic.ListView):
     template_name = "polls/index.html"
     context_object_name = "latest_question_list"
 
     def get_queryset(self):
         return Question.objects.filter(pub_date__lte=timezone.now()).order_by("-pub_date")[
-        :5
+            :5
         ]
-    
+
+
 class DetailView(generic.DetailView):
     model = Question
     template_name = "polls/details.html"
-    
+
     def get_queryset(self):
         return Question.objects.filter(pub_date__lte=timezone.now())
+
 
 class ResultView(generic.DetailView):
     model = Question
     template_name = "polls/results.html"
 
 # Create your views here.
+
+
 def index(request):
     latest_question_list = Question.objects.order_by("-pub_date")[:5]
     context = {"latest_question_list": latest_question_list}
@@ -44,13 +49,16 @@ def index(request):
         mensagem = "Bem-vindo! Faça login para continuar."
     return render(request, "polls/index.html", context)
 
+
 def details(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
     return render(request, "polls/details.html", {"question": question})
 
+
 def results(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
     return render(request, "polls/results.html", {"question": question})
+
 
 def vote(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
@@ -70,7 +78,8 @@ def vote(request, question_id):
         selected_choice.votes = F("votes") + 1
         selected_choice.save()
         return HttpResponseRedirect(reverse("polls:results", args=(question.id,)))
-    
+
+
 def login_view(request):
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -81,16 +90,18 @@ def login_view(request):
         if user is not None:
             auth.login(request, user)
             messages.success(request, 'Login realizado com sucesso!')
-            return redirect('home')
+            return redirect('polls:index')
         else:
             messages.error(request, 'Usuário ou senha inválidos!')
 
     return render(request, 'polls/login.html')
 
+
 def logout_view(request):
     auth.logout(request)
     messages.success(request, 'Logout realizado com sucesso!')
     return redirect('polls:login')
+
 
 def registro_view(request):
     if request.method == 'POST':
@@ -102,19 +113,20 @@ def registro_view(request):
         if password != password_confirm:
             messages.error(request, 'As senhas não são iguais!')
             return render(request, 'polls/registro.html')
-        
+
         if len(password) < 6:
-            messages.error(request, "A senha deve ter pelo menos 6 caracteres!")
+            messages.error(
+                request, "A senha deve ter pelo menos 6 caracteres!")
             return render(request, 'polls/registro.html')
-        
+
         if User.objects.filter(username=username).exists():
             messages.error(request, 'Nome de usuário já utilizado!')
             return render(request, 'polls/registro.html')
-        
+
         if User.objects.filter(email=email).exists():
             messages.error(request, 'Email já cadastrado!')
             return render(request, 'polls/registro.html')
-        
+
         # Cria o usuario
         user = User.objects.create_user(
             username=username,
@@ -129,15 +141,15 @@ def registro_view(request):
             idade=idade if idade else None
         )
 
-        messages.success(request, 'Conta criada com sucesso! Agora faça login.')
+        messages.success(
+            request, 'Conta criada com sucesso! Agora faça login.')
         return redirect('login')
-    
-    return render(request, 'polls/registro.html')
 
+    return render(request, 'polls/registro.html')
 
 
 # View protegida (requer login)
 @login_required(login_url='login')
 def perfil_view(request):
-    #request.user já esta disponivel e autenticado
+    # request.user já esta disponivel e autenticado
     return render(request, 'polls/perfil.html', {'user': request.user})
