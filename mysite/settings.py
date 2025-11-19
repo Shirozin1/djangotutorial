@@ -123,15 +123,15 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-INTERNAL_IPS =  [
+INTERNAL_IPS = [
     "127.0.0.1",
 ]
 
 # URL de redirecionamento após login
-LOGIN_REDIRECT_URL = 'home'
+LOGIN_REDIRECT_URL = 'polls:index'
 
 # URL de redirecionamento após logout
-LOGOUT_REDIRECT_URL = 'login'
+LOGOUT_REDIRECT_URL = 'polls:login'
 
 # URL da página de login
-LOGIN_URL = 'login'
+LOGIN_URL = 'polls:login'

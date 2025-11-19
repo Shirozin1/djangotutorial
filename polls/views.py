@@ -9,6 +9,8 @@ from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from .models import Question, Choice, Usuario
+from datetime import date
+from .forms import RegistroForm
 
 
 class IndexView(generic.ListView):
@@ -104,48 +106,34 @@ def logout_view(request):
 
 
 def registro_view(request):
+    hoje = timezone.now().date()
     if request.method == 'POST':
-        username = request.POST.get('username')
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-        password_confirm = request.POST.get('password_confirm')
 
-        if password != password_confirm:
-            messages.error(request, 'As senhas não são iguais!')
-            return render(request, 'polls/registro.html')
+        form = RegistroForm(request.POST)
 
-        if len(password) < 6:
-            messages.error(
-                request, "A senha deve ter pelo menos 6 caracteres!")
-            return render(request, 'polls/registro.html')
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            email = form.cleaned_data['email']
+            password = form.cleaned_data['password']
+            data_nascimento = form.cleaned_data['data_nascimento']
 
-        if User.objects.filter(username=username).exists():
-            messages.error(request, 'Nome de usuário já utilizado!')
-            return render(request, 'polls/registro.html')
+            # Cria o usuario
+            user = User.objects.create_user(
+                username=username,
+                email=email,
+                password=password
+            )
 
-        if User.objects.filter(email=email).exists():
-            messages.error(request, 'Email já cadastrado!')
-            return render(request, 'polls/registro.html')
+            messages.success(
+                request, 'Conta criada com sucesso! Agora faça login.')
+            return redirect('polls:login')
 
-        # Cria o usuario
-        user = User.objects.create_user(
-            username=username,
-            email=email,
-            password=password
-        )
+        return render(request, 'polls/registro.html', {'form': form})
 
-        # Cria o perfil
-        perfil = Usuario.objects.create(
-            user=user,
-            data_nascimento=data_nascimento if data_nascimento else None,
-            idade=idade if idade else None
-        )
+    else:
+        form = RegistroForm()
 
-        messages.success(
-            request, 'Conta criada com sucesso! Agora faça login.')
-        return redirect('login')
-
-    return render(request, 'polls/registro.html')
+    return render(request, 'polls/registro.html', {'form': form})
 
 
 # View protegida (requer login)
